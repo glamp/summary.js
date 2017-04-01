@@ -9,12 +9,11 @@ import _ from 'lodash';
 import * as d3 from 'd3';
 import simpleStatistics from 'simple-statistics';
 
-const diamonds = require('../datasets/diamonds.json'); // .filter((i) => Math.random() <= 0.05);
+const diamonds = require('../datasets/diamonds.json');
 
 function round(value, decimals) {
   return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
 }
-
 
 function collectionToDataFrame(data) {
   var df = {};
