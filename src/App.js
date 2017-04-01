@@ -274,7 +274,7 @@ class App extends Component {
                   {this.getColumns().map((column) => {
                     return (
                       <p onClick={() => this.addDimension(column.name)} className="highlight">
-                        <FontAwesome name={column.type==='number' ? 'hashtag' : 'bars'} />{' '}{column.name}
+                        <FontAwesome name={column.type==='number' ? 'hashtag' : 'font'} />{' '}{column.name}
                       </p>
                     );
                   })}
