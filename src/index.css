@@ -1,0 +1,23 @@
+.highlight {
+  padding: 7.5px;
+  border-radius: 5px;
+}
+
+.highlight:hover {
+  background-color: lightgrey;
+}
+
+.panel-body {
+  padding: 5px;
+}
+
+.box {
+  width: 24%;
+  margin: 4px;
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+}
+
+.stat {
+  margin: 0 0 0px;
+}
