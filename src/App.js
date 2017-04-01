@@ -184,7 +184,7 @@ class App extends Component {
           </Row>
         </Grid>
       );
-    } else if (diamonds.length > 1000 && (this.state.chartType==='bar' || !this.state.y)) {
+    } else if (diamonds.length > 50 && (this.state.chartType==='bar' || !this.state.y)) {
       chart = <Bar
           data={this.getHistogramData(this.state.x)}
           width={100}
@@ -206,7 +206,7 @@ class App extends Component {
             maintainAspectRatio: false
           }}
         />
-    } else if (diamonds.length <= 1000 && (this.state.chartType==='bar' || !this.state.y)) {
+    } else if (diamonds.length <= 50 && (this.state.chartType==='bar' || !this.state.y)) {
       chart = <Line
           data={this.getLineData(this.state.x)}
           width={100}
