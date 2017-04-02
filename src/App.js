@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Label, Grid, Row, Col, Panel, Button } from 'react-bootstrap';
+import { DragDropContextProvider } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 import 'bootswatch/simplex/bootstrap.css';
 import FontAwesome from 'react-fontawesome';
 import './index.css';
@@ -8,6 +10,9 @@ import { Bar, Line } from 'react-chartjs-2';
 import _ from 'lodash';
 import * as d3 from 'd3';
 import simpleStatistics from 'simple-statistics';
+
+import DraggableField from './components/DraggableField/DraggableField';
+import FieldTarget from './components/FieldTarget/FieldTarget';
 
 const diamonds = require('../datasets/diamonds.json');
 
@@ -264,62 +269,63 @@ class App extends Component {
     }
 
     return (
-      <div>
-        <br />
-        <Grid>
-          <Row>
-            <Col sm={3}>
-              <Panel style={{ minHeight: 700, maxHeight: 700, overflow: 'scroll' }}>
-                <div>
-                  {this.getColumns().map((column) => {
-                    return (
-                      <p onClick={() => this.addDimension(column.name)} className="highlight">
-                        <FontAwesome name={column.type==='number' ? 'hashtag' : 'font'} />{' '}{column.name}
-                      </p>
-                    );
-                  })}
-                </div>
-              </Panel>
-            </Col>
-            <Col sm={9}>
-              <Row>
-                <Col sm={8}>
-                  <Panel style={{ minHeight: 75, padding: 5 }}>
-                    <div>
-                      <Label bsStyle="primary">{this.state.x}</Label>{' '}
-                    </div>
-                    <hr style={{ margin: 5 }}/>
-                    <div>
-                      <Label bsStyle="primary">{this.state.y}</Label>{' '}
-                    </div>
-                  </Panel>
-                </Col>
-                <Col sm={2} onClick={() => this.setState({ x: null, y: null, chartType: this.state.chartType==='scatter' ? 'bar' : 'scatter' })}>
-                  <Panel className='text-center'>
-                    <div className={this.state.chartType==='scatter' ? '' : 'hide'}>
-                      <FontAwesome name='area-chart' size='2x' />
-                      <p>Line Chart</p>
-                    </div>
-                    <div className={this.state.chartType==='bar' ? '' : 'hide'}>
-                      <FontAwesome name='bar-chart' size='2x' />
-                      <p>Bar Chart</p>
-                    </div>
-                  </Panel>
-                </Col>
-                <Col sm={2} onClick={() => this.setState({ x: null, y: null })}>
-                  <Panel className='text-center'>
-                    <FontAwesome name='trash' size='2x' />
-                    <p>Clear</p>
-                  </Panel>
-                </Col>
-              </Row>
-              <Panel style={{ minHeight: 350*2 - 75 - 17 }}>
-                {chart}
-              </Panel>
-            </Col>
-          </Row>
-        </Grid>
-      </div>
+      <DragDropContextProvider backend={HTML5Backend}>
+        <FieldTarget action='removeItem'>
+          <br />
+          <Grid>
+            <Row>
+              <Col sm={3}>
+                <Panel style={{ minHeight: 700, maxHeight: 700, overflow: 'scroll' }}>
+                  <div>
+                    {this.getColumns().map((column) => {
+                      return (
+                        <div>
+                          <DraggableField name={column.name}
+                                          icon={<FontAwesome name={column.type==='number' ? 'hashtag' : 'font'} />}
+                                          onDrop={() => this.addDimension(column.name)} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </Panel>
+              </Col>
+              <Col sm={9}>
+                <Row>
+                  <Col sm={8}>
+                    <Panel style={{ minHeight: 75, padding: 5 }}>
+                      <FieldTarget>
+                        x: <DraggableField name={this.state.x} onDrop={() => this.setState({ x: null })} />
+                        y: <DraggableField name={this.state.y} onDrop={() => this.setState({ y: null })} />
+                      </FieldTarget>
+                    </Panel>
+                  </Col>
+                  <Col sm={2} onClick={() => this.setState({ x: null, y: null, chartType: this.state.chartType==='scatter' ? 'bar' : 'scatter' })}>
+                    <Panel className='text-center'>
+                      <div className={this.state.chartType==='scatter' ? '' : 'hide'}>
+                        <FontAwesome name='area-chart' size='2x' />
+                        <p>Line Chart</p>
+                      </div>
+                      <div className={this.state.chartType==='bar' ? '' : 'hide'}>
+                        <FontAwesome name='bar-chart' size='2x' />
+                        <p>Bar Chart</p>
+                      </div>
+                    </Panel>
+                  </Col>
+                  <Col sm={2} onClick={() => this.setState({ x: null, y: null })}>
+                    <Panel className='text-center'>
+                      <FontAwesome name='trash' size='2x' />
+                      <p>Clear</p>
+                    </Panel>
+                  </Col>
+                </Row>
+                <Panel style={{ minHeight: 350*2 - 75 - 17 }}>
+                  {chart}
+                </Panel>
+              </Col>
+            </Row>
+          </Grid>
+        </FieldTarget>
+      </DragDropContextProvider>
     );
   }
 }
