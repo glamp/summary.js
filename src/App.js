@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Label, Grid, Row, Col, Panel, Button } from 'react-bootstrap';
 import { DragDropContextProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-import 'bootswatch/simplex/bootstrap.css';
+import 'bootswatch/lumen/bootstrap.css';
 import FontAwesome from 'react-fontawesome';
 import './index.css';
 import 'font-awesome/css/font-awesome.css';
