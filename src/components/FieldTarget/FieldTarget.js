@@ -17,12 +17,10 @@ const style2 = {
 };
 
 const boxTarget = {
-  drop() {
-    return { name: 'FieldTarget' };
+  drop(props) {
+    return props;
   },
 };
-
-
 
 class FieldTarget extends Component {
   static propTypes = {

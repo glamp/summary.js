@@ -5,12 +5,12 @@ const ItemTypes = { DraggableField: 'box' }
 
 
 const style = {
+  cursor: 'move',
   // border: '1px dashed gray',
   // backgroundColor: 'white',
-  padding: '0.5rem 1rem',
-  marginRight: '1.5rem',
-  marginBottom: '1.5rem',
-  cursor: 'move',
+  // padding: '0.5rem 1rem',
+  // marginRight: '1.5rem',
+  // marginBottom: '1.5rem',
   // float: 'left',
 };
 
@@ -26,7 +26,9 @@ const boxSource = {
     const dropResult = monitor.getDropResult();
 
     if (dropResult) {
-      props.onDrop && props.onDrop();
+      props.onDrop && props.onDrop(dropResult.dimension);
+    } else {
+      props.removeDimension && props.removeDimension();
     }
   },
 };
@@ -44,12 +46,12 @@ class DraggableField extends Component {
     const opacity = isDragging ? 0.4 : 1;
 
     if (! name) {
-      return <span></span>
+      return <p className="text-center text-muted">{this.props.dimension}</p>
     }
 
     return (
       connectDragSource(
-        <div style={{ ...style, opacity }}>
+        <div onClick={this.props.onClick} style={{ ...style, opacity }}>
           {icon}
           {' '}
           {name}

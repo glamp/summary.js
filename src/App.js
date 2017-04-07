@@ -2,23 +2,26 @@ import React, { Component } from 'react';
 import { Label, Grid, Row, Col, Panel, Button } from 'react-bootstrap';
 import { DragDropContextProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-import 'bootswatch/lumen/bootstrap.css';
 import FontAwesome from 'react-fontawesome';
-import './index.css';
-import 'font-awesome/css/font-awesome.css';
-import { Bar, Line } from 'react-chartjs-2';
-import _ from 'lodash';
-import * as d3 from 'd3';
-import simpleStatistics from 'simple-statistics';
 
+import _ from 'lodash';
+import { histogram } from 'd3';
+import simpleStatistics from 'simple-statistics';
+import 'font-awesome/css/font-awesome.css';
+import 'bootswatch/flatly/bootstrap.css';
+import './index.css';
+
+import charts from './services/charts';
+
+import Summary from './components/Summary/Summary';
+import ChartIcon from './components/ChartIcon/ChartIcon';
 import DraggableField from './components/DraggableField/DraggableField';
 import FieldTarget from './components/FieldTarget/FieldTarget';
+import Box from './components/Box/Box';
 
-const diamonds = require('../datasets/diamonds.json');
+// const diamonds = require('../datasets/diamonds.json');
+const diamonds = require('../datasets/diamonds-small.json');
 
-function round(value, decimals) {
-  return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
-}
 
 function collectionToDataFrame(data) {
   var df = {};
@@ -56,15 +59,23 @@ const theme = {
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { chartType: 'bar' }
+    this.state = {
+      chartType: null,
+      x: { name: null, type: null },
+      y: { name: null, type: null },
+      color: { name: null, type: null },
+    }
   }
 
   getDiamondsData(x, y) {
     return _.map(diamonds, (row) => {
-      return {
-        x: row[x],
-        y: row[y]
-      };
+      var data = {
+        x: row[x]
+      }
+      if (y) {
+        data.y = row[y];
+      }
+      return data;
     });
   }
 
@@ -84,8 +95,14 @@ class App extends Component {
     }
   }
 
-  getLineData(x) {
-    var data = _.map(diamonds, x);
+  getLineData(x, y) {
+    var data = this.getDiamondsData(x, y);
+    data = _.sampleSize(data, Math.min(data.length, 20));
+    if (! y) {
+      data = _.zip(_.range(0, data.length), data).map((item) => {
+        return { x: item[0], y: item[0] }
+      });
+    }
     return {
       labels: _.range(0, data.length).map((i) => `${i}`),
       datasets: [{
@@ -108,7 +125,7 @@ class App extends Component {
       labels = _.keys(agg);
       values = _.values(agg);
     } else {
-      var hist = d3.histogram().thresholds(19)
+      var hist = histogram().thresholds(19)
       var bins = hist(data);
       labels = _.map(bins, (x) => x.x0);
       values = _.map(bins, (x) => x.length);
@@ -136,195 +153,133 @@ class App extends Component {
     });
   }
 
-  addDimension(columnName) {
-    if (! this.state.x || this.state.chartType==='bar') {
-      this.setState({ x: columnName })
-      return;
-    }
-    this.setState({ y: columnName })
+  addDimension(dimension, column) {
+    var { state } = this;
+    state[dimension] = column;
+    this.setState(state);
+    this.setState({ chartType: null });
+  }
+
+  getChartType() {
+    this.state.x.name
+    this.state.y.name
   }
 
   render() {
 
     var chart;
-
-
-    if (!this.state.x && !this.state.y) {
-      chart = (
-        <Grid style={{ width: '100%', height: 350*2 - 75 - 50 }}>
-          <Row className='text-center'>
-            {this.getSummaryStats().map((stat) => {
-              if (_.isArray(stat[1])===true) {
-                return (
-                  <Col className='box text-center' sm={3}>
-                    <b className="muted">{stat[0]}</b>
-                    <hr style={{ margin: 0, padding: 0}}/>
-                    {_.range(0, 6).map((i) => {
-                      var item = stat[1][i];
-                      if (! item) {
-                        return <p className="stat">{'-'}</p>
-                      }
-                      return (
-                        <p className="stat">{item[0]}: {item[1]}</p>
-                      );
-                    })}
-                  </Col>
-                )
-              }
-
-              return (
-                  <Col className='box text-center' sm={3}>
-                    <b className="muted">{stat[0]}</b>
-                    <hr style={{ margin: 0, padding: 0}}/>
-                    <p className="stat">Min: {round(stat[1].min, 3)}</p>
-                    <p className="stat">25%: {round(stat[1].q25, 3)}</p>
-                    <p className="stat">Mean: {round(stat[1].mean, 3)}</p>
-                    <p className="stat">Median: {round(stat[1].median, 3)}</p>
-                    <p className="stat">75%: {round(stat[1].q75, 3)}</p>
-                    <p className="stat">Max: {round(stat[1].max, 3)}</p>
-                  </Col>
-              );
-            })}
-          </Row>
-        </Grid>
-      );
-    } else if (diamonds.length > 50 && (this.state.chartType==='bar' || !this.state.y)) {
-      chart = <Bar
-          data={this.getHistogramData(this.state.x)}
-          width={100}
-          height={350*2 - 75 - 50}
-          options={{
-            legend: {
-              display: false
-            },
-            scales: {
-              xAxes: [{
-                scaleLabel: {
-                  display: true,
-                  fontSize: 16,
-                  fontStyle: 'italic',
-                  labelString: this.state.x
-                }
-              }],
-            },
-            maintainAspectRatio: false
-          }}
-        />
-    } else if (diamonds.length <= 50 && (this.state.chartType==='bar' || !this.state.y)) {
-      chart = <Line
-          data={this.getLineData(this.state.x)}
-          width={100}
-          height={350*2 - 75 - 50}
-          options={{
-            legend: {
-              display: false
-            },
-            showLines: true,
-            scales: {
-              xAxes: [{
-                scaleLabel: {
-                  display: true,
-                  fontSize: 16,
-                  fontStyle: 'italic',
-                  labelString: this.state.x
-                }
-              }]
-            },
-            maintainAspectRatio: false
-          }}
-        />
-    } else if (this.state.chartType==='scatter') {
-      chart = <Line
-          data={this.getScatterData(this.state.x, this.state.y)}
-          width={100}
-          height={350*2 - 75 - 50}
-          options={{
-            legend: {
-              display: false
-            },
-            showLines: false,
-            scales: {
-              xAxes: [{
-                scaleLabel: {
-                  display: true,
-                  fontSize: 16,
-                  fontStyle: 'italic',
-                  labelString: this.state.x
-                },
-                type: 'linear',
-                position: 'bottom'
-              }],
-              yAxes: [{
-                scaleLabel: {
-                  display: true,
-                  fontSize: 16,
-                  fontStyle: 'italic',
-                  labelString: this.state.y
-                },
-              }]
-            },
-            maintainAspectRatio: false
-          }}
-        />
+    if (!this.state.x.name && !this.state.y.name) {
+      chart = <Summary statistics={this.getSummaryStats()} />
+    } else if (this.state.chartType) {
+      if (this.state.chartType==='line') {
+        chart = charts.makeLine(this.getLineData(this.state.x.name, this.state.y.name), this.state.x.name);
+      } else if (this.state.chartType==='histogram') {
+        chart = charts.makeHistogram(this.getHistogramData(this.state.x.name), this.state.x.name);
+      } else if (this.state.chartType==='bar') {
+        chart = charts.makeHistogram(this.getHistogramData(this.state.x.name), this.state.x.name);
+      } else if (this.state.chartType==='scatter') {
+        chart = charts.makeScatter(this.getScatterData(this.state.x.name, this.state.y.name), this.state.x.name, this.state.y.name);
+      }
+    } else if (this.state.x.name && this.state.y.name && diamonds.length < 100) {
+      chart = charts.makeLine(this.getLineData(this.state.x.name, this.state.y.name), this.state.x.name);
+    } else if (this.state.x.name && this.state.y.name) {
+      chart = charts.makeScatter(this.getScatterData(this.state.x.name, this.state.y.name), this.state.x.name, this.state.y.name);
+    } else if (this.state.x.name) {
+      chart = charts.makeHistogram(this.getHistogramData(this.state.x.name), this.state.x.name);
     }
 
     return (
       <DragDropContextProvider backend={HTML5Backend}>
-        <FieldTarget action='removeItem'>
+        <div>
           <br />
           <Grid>
             <Row>
-              <Col sm={3}>
+              <Col sm={2}>
                 <Panel style={{ minHeight: 700, maxHeight: 700, overflow: 'scroll' }}>
                   <div>
                     {this.getColumns().map((column) => {
                       return (
-                        <div>
+                        <div style={{ marginBottom: 10 }}>
                           <DraggableField name={column.name}
                                           icon={<FontAwesome name={column.type==='number' ? 'hashtag' : 'font'} />}
-                                          onDrop={() => this.addDimension(column.name)} />
+                                          onClick={() => this.addDimension(! this.state.x.name ? 'x' : 'y', column)}
+                                          onDrop={(dimension) => this.addDimension(dimension, column)} />
                         </div>
                       );
                     })}
                   </div>
                 </Panel>
               </Col>
-              <Col sm={9}>
+              <Col sm={10}>
                 <Row>
                   <Col sm={8}>
-                    <Panel style={{ minHeight: 75, padding: 5 }}>
-                      <FieldTarget>
-                        x: <DraggableField name={this.state.x} onDrop={() => this.setState({ x: null })} />
-                        y: <DraggableField name={this.state.y} onDrop={() => this.setState({ y: null })} />
-                      </FieldTarget>
-                    </Panel>
-                  </Col>
-                  <Col sm={2} onClick={() => this.setState({ x: null, y: null, chartType: this.state.chartType==='scatter' ? 'bar' : 'scatter' })}>
-                    <Panel className='text-center'>
-                      <div className={this.state.chartType==='scatter' ? '' : 'hide'}>
-                        <FontAwesome name='area-chart' size='2x' />
-                        <p>Line Chart</p>
-                      </div>
-                      <div className={this.state.chartType==='bar' ? '' : 'hide'}>
-                        <FontAwesome name='bar-chart' size='2x' />
-                        <p>Bar Chart</p>
-                      </div>
-                    </Panel>
-                  </Col>
-                  <Col sm={2} onClick={() => this.setState({ x: null, y: null })}>
-                    <Panel className='text-center'>
-                      <FontAwesome name='trash' size='2x' />
-                      <p>Clear</p>
-                    </Panel>
+                    <Row>
+                      <Col sm={4}>
+                        <FieldTarget dimension='x'>
+                          <Box style={{ minHeight: 40 }}>
+                            <DraggableField dimension='x'
+                                            name={this.state.x.name}
+                                            removeDimension={() => this.setState({ x: { name: null, type: null } })} />
+                          </Box>
+                        </FieldTarget>
+                      </Col>
+                      <Col sm={4}>
+                        <FieldTarget dimension='y'>
+                          <Box style={{ minHeight: 40 }}>
+                            <DraggableField dimension='y'
+                                            name={this.state.y.name}
+                                            removeDimension={() => this.setState({ y: { name: null, type: null } })} />
+                          </Box>
+                        </FieldTarget>
+                      </Col>
+                      <Col sm={4}>
+                        <FieldTarget dimension='color'>
+                          <Box style={{ minHeight: 40 }}>
+                            <DraggableField dimension='color'
+                                            name={this.state.color.name}
+                                            removeDimension={() => this.setState({ color: { name: null, type: null } })} />
+                          </Box>
+                        </FieldTarget>
+                      </Col>
+                    </Row>
                   </Col>
                 </Row>
-                <Panel style={{ minHeight: 350*2 - 75 - 17 }}>
-                  {chart}
-                </Panel>
+                <hr />
+                <div style={{ minHeight: 350*2 - 75 - 17 }}>
+                  <Row>
+                    <Col sm={10}>
+                      {chart}
+                    </Col>
+                    <Col className="text-center" sm={2}>
+                      <p>charts</p>
+                      <Box>
+                        <ChartIcon type='Line'
+                                   isAvailable={this.state.x.name}
+                                   onClick={() => this.setState({ chartType: 'line' })}
+                                   isSelected={this.state.chartType==='line'} />
+                        <hr />
+                        <ChartIcon type='Bar'
+                                   isAvailable={this.state.x.name}
+                                   onClick={() => this.setState({ chartType: 'bar' })}
+                                   isSelected={this.state.chartType==='bar'} />
+                        <hr />
+                        <ChartIcon type='Histogram'
+                                   isAvailable={this.state.x.name}
+                                   onClick={() => this.setState({ chartType: 'histogram' })}
+                                  isSelected={this.state.chartType==='histogram'} />
+                        <hr />
+                        <ChartIcon type='Scatter'
+                                   isAvailable={this.state.x.name && this.state.y.name}
+                                   onClick={() => this.setState({ chartType: 'scatter' })}
+                                   isSelected={this.state.chartType==='scatter'} />
+                      </Box>
+                    </Col>
+                  </Row>
+                </div>
               </Col>
             </Row>
           </Grid>
-        </FieldTarget>
+        </div>
       </DragDropContextProvider>
     );
   }
