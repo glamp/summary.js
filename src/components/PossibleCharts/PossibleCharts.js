@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import Box from '../Box/Box';
 import { Button } from 'react-bootstrap';
 import ChartIcon from '../ChartIcon/ChartIcon';
+import FontAwesome from 'react-fontawesome';
 import './possiblecharts.css';
 
 
@@ -40,7 +41,12 @@ export default class PossibleCharts extends Component {
     );
     return (
       <div className="dropdown">
-        <Button onClick={() => this.setState({ showCharts: !this.state.showCharts })} bsStyle="primary" block>charts</Button>
+        <Button onClick={() => this.setState({ showCharts: !this.state.showCharts })}
+                bsStyle="primary" block>
+                <FontAwesome name={this.state.showCharts===true ? 'chevron-down' : 'chevron-right'} />
+                {' '}
+                charts
+        </Button>
         <div className="dropdown-content">
           {this.state.showCharts && chartOptions}
         </div>

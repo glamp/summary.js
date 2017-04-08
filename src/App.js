@@ -12,6 +12,8 @@ import 'bootswatch/lumen/bootstrap.css';
 import './index.css';
 
 import charts from './services/charts';
+import grouper from './services/grouper';
+import palettes from './services/palettes';
 
 import Summary from './components/Summary/Summary';
 import PossibleCharts from './components/PossibleCharts/PossibleCharts';
@@ -21,7 +23,6 @@ import Box from './components/Box/Box';
 
 const diamonds = require('../datasets/diamonds.json');
 // const diamonds = require('../datasets/diamonds-small.json');
-
 
 function collectionToDataFrame(data) {
   var df = {};
@@ -53,7 +54,7 @@ _.keys(df).map((key) => {
 });
 
 const theme = {
-  primaryColor: '#555555', // '#158CBA'
+  primaryColor: 'rgb(85, 85, 85, 1)', // '#158CBA'
 }
 
 class App extends Component {
@@ -80,18 +81,58 @@ class App extends Component {
   }
 
   getScatterData(x, y) {
-    var data = this.getDiamondsData(x, y);
-    data = _.sampleSize(data, Math.min(data.length, 1000));
-    return {
-      labels: `${x} vs. ${y}`,
-      datasets: [{
-        backgroundColor: theme.primaryColor,
-        borderColor: theme.primaryColor,
+    var data = _.sampleSize(diamonds, Math.min(diamonds.length, 1000));
+    var groupers = [];
+    if (this.state.color.name) {
+      groupers.push(this.state.color.name);
+    }
+    var aggreatedData = grouper.aggregate(data, groupers);
+
+    var colorGen;
+    var c = 0;
+    if (! this.state.color.name) {
+      colorGen = () => theme.primaryColor;
+    } else if (this.state.color.type==='number') {
+      var colorData = _.map(data, this.state.color.name);
+      var min = _.min(colorData);
+      var max = _.max(colorData);
+      colorGen = palettes.numerical(min, max);
+    } else {
+      var nColorsNeeded = _.size(aggreatedData);
+      colorGen = palettes.categorical(nColorsNeeded);
+    }
+
+    var datasets = _.map(_.toPairs(aggreatedData), (group) => {
+      c++;
+      var bgColor, borderColor;
+      if (this.state.color.type==='number') {
+        borderColor = _.map(group[1], (i) => colorGen(i[this.state.color.name]));
+        bgColor = _.map(borderColor, (i) => i.replace(', 1)', ', 0.5)')); //, theme.primaryColor,
+      } else {
+        borderColor = colorGen(c) //, theme.primaryColor,
+        bgColor = borderColor.replace(', 1)', ', 0.5)'); //, theme.primaryColor,
+      }
+      return {
+        label: group[0],
+        backgroundColor: bgColor,
+        borderColor: borderColor,
         borderWidth: 1,
-        hoverBackgroundColor: 'coral',
-        hoverBorderColor: 'coral',
-        data: data
-      }]
+        data:  _.map(group[1], (i) => {
+          return { x: i[x], y: i[y] };
+        }),
+      }
+    });
+
+    return {
+      datasets: datasets
+      // datasets: [{
+      //   backgroundColor: theme.primaryColor.replace(', 1)', ', 0.5)'),
+      //   borderColor: theme.primaryColor,
+      //   borderWidth: 2,
+      //   hoverBackgroundColor: 'coral',
+      //   hoverBorderColor: 'coral',
+      //   data: data
+      // }]
     }
   }
 
@@ -116,6 +157,22 @@ class App extends Component {
     }
   }
 
+  colorPaletteGenerator() {
+    const colors = [
+      'rgba(239, 236, 202, 1)',
+      'rgba(0, 48, 73, 1)',
+      'rgba(244, 211, 94, 1)',
+      'rgba(255, 147, 79, 1)',
+      'rgba(193, 145, 161, 1)',
+      // '#E7ECEF',
+      // '#274C77',
+      // '#6096BA',
+      // '#A3CEF1',
+      // '#8B8C89'
+    ]
+    return (i) => colors[i % colors.length]
+  }
+
   getHistogramData(x) {
     var data = _.map(diamonds, (item) => item[x]);
 
@@ -130,16 +187,40 @@ class App extends Component {
       labels = _.map(bins, (x) => x.x0);
       values = _.map(bins, (x) => x.length);
     }
+    var min = _.min(data);
+    var max = _.max(data);
+    var hist = histogram().domain([min, max]).thresholds(19)
+    // var aggreatedData = grouper.aggregate(diamonds, [this.state.color.name]);
+    var aggreatedData = grouper.aggregate(diamonds, ['clarity']);
+
+    var c = 0;
+    var nColorsNeeded = _.size(aggreatedData);
+    var colorGen = palettes.categorical(nColorsNeeded);
+
+    var datasets = _.map(_.toPairs(aggreatedData), (group) => {
+      var bins = hist(_.map(group[1], x));
+      var labels = _.map(bins, (x) => x.x0);
+      var values = _.map(bins, (x) => x.length);
+      c++;
+      return {
+        label: labels,
+        backgroundColor: colorGen(c).replace(', 1)', ', 0.5)'), //, theme.primaryColor,
+        borderColor: colorGen(c), //, theme.primaryColor,
+        borderWidth: 2,
+        data: values,
+      }
+    });
 
     return {
       labels: labels,
-      datasets: [{
-        label: x,
-        backgroundColor: theme.primaryColor,
-        borderColor: theme.primaryColor,
-        borderWidth: 1,
-        data: values,
-      }]
+      datasets: datasets
+      // datasets: [{
+      //   label: x,
+      //   backgroundColor: theme.primaryColor,
+      //   borderColor: theme.primaryColor,
+      //   borderWidth: 1,
+      //   data: values,
+      // }]
     };
   }
 
