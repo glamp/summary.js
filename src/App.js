@@ -190,8 +190,7 @@ class App extends Component {
     var min = _.min(data);
     var max = _.max(data);
     var hist = histogram().domain([min, max]).thresholds(19)
-    // var aggreatedData = grouper.aggregate(diamonds, [this.state.color.name]);
-    var aggreatedData = grouper.aggregate(diamonds, ['clarity']);
+    var aggreatedData = grouper.aggregate(diamonds, [this.state.color.name]);
 
     var c = 0;
     var nColorsNeeded = _.size(aggreatedData);
@@ -199,7 +198,7 @@ class App extends Component {
 
     var datasets = _.map(_.toPairs(aggreatedData), (group) => {
       var bins = hist(_.map(group[1], x));
-      var labels = _.map(bins, (x) => x.x0);
+      var labels = _.map(bins, 'x0');
       var values = _.map(bins, (x) => x.length);
       c++;
       return {
@@ -212,15 +211,8 @@ class App extends Component {
     });
 
     return {
-      labels: labels,
+      labels: _.map(hist(data), 'x0'),
       datasets: datasets
-      // datasets: [{
-      //   label: x,
-      //   backgroundColor: theme.primaryColor,
-      //   borderColor: theme.primaryColor,
-      //   borderWidth: 1,
-      //   data: values,
-      // }]
     };
   }
 
