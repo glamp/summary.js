@@ -8,19 +8,19 @@ import _ from 'lodash';
 import { histogram } from 'd3';
 import simpleStatistics from 'simple-statistics';
 import 'font-awesome/css/font-awesome.css';
-import 'bootswatch/flatly/bootstrap.css';
+import 'bootswatch/lumen/bootstrap.css';
 import './index.css';
 
 import charts from './services/charts';
 
 import Summary from './components/Summary/Summary';
-import ChartIcon from './components/ChartIcon/ChartIcon';
+import PossibleCharts from './components/PossibleCharts/PossibleCharts';
 import DraggableField from './components/DraggableField/DraggableField';
 import FieldTarget from './components/FieldTarget/FieldTarget';
 import Box from './components/Box/Box';
 
-// const diamonds = require('../datasets/diamonds.json');
-const diamonds = require('../datasets/diamonds-small.json');
+const diamonds = require('../datasets/diamonds.json');
+// const diamonds = require('../datasets/diamonds-small.json');
 
 
 function collectionToDataFrame(data) {
@@ -53,7 +53,7 @@ _.keys(df).map((key) => {
 });
 
 const theme = {
-  primaryColor: '#158CBA'
+  primaryColor: '#555555', // '#158CBA'
 }
 
 class App extends Component {
@@ -100,7 +100,7 @@ class App extends Component {
     data = _.sampleSize(data, Math.min(data.length, 20));
     if (! y) {
       data = _.zip(_.range(0, data.length), data).map((item) => {
-        return { x: item[0], y: item[0] }
+        return { x: item[0], y: item[1].x }
       });
     }
     return {
@@ -167,7 +167,7 @@ class App extends Component {
 
   render() {
 
-    var chart;
+    var chart, guessedChartType;
     if (!this.state.x.name && !this.state.y.name) {
       chart = <Summary statistics={this.getSummaryStats()} />
     } else if (this.state.chartType) {
@@ -182,10 +182,13 @@ class App extends Component {
       }
     } else if (this.state.x.name && this.state.y.name && diamonds.length < 100) {
       chart = charts.makeLine(this.getLineData(this.state.x.name, this.state.y.name), this.state.x.name);
+      guessedChartType = 'line';
     } else if (this.state.x.name && this.state.y.name) {
       chart = charts.makeScatter(this.getScatterData(this.state.x.name, this.state.y.name), this.state.x.name, this.state.y.name);
+      guessedChartType = 'scatter';
     } else if (this.state.x.name) {
       chart = charts.makeHistogram(this.getHistogramData(this.state.x.name), this.state.x.name);
+      guessedChartType = 'histogram';
     }
 
     return (
@@ -195,7 +198,6 @@ class App extends Component {
           <Grid>
             <Row>
               <Col sm={2}>
-                <Panel style={{ minHeight: 700, maxHeight: 700, overflow: 'scroll' }}>
                   <div>
                     {this.getColumns().map((column) => {
                       return (
@@ -207,14 +209,22 @@ class App extends Component {
                         </div>
                       );
                     })}
+                    <Button style={{ position: 'fixed', bottom: 0, right: 33 }}
+                            onClick={() => alert('This does nothing!')}
+                            bsStyle="primary"
+                            bsSize="small"><FontAwesome name='save' /></Button>
+
+                    <Button style={{ position: 'fixed', bottom: 0, right: 0 }}
+                            onClick={() => this.setState({ x: {}, y: {}, color: {} })}
+                            bsStyle="danger"
+                            bsSize="small"><FontAwesome name='trash' /></Button>
                   </div>
-                </Panel>
               </Col>
               <Col sm={10}>
                 <Row>
-                  <Col sm={8}>
+                  <Col sm={12}>
                     <Row>
-                      <Col sm={4}>
+                      <Col sm={3}>
                         <FieldTarget dimension='x'>
                           <Box style={{ minHeight: 40 }}>
                             <DraggableField dimension='x'
@@ -223,7 +233,7 @@ class App extends Component {
                           </Box>
                         </FieldTarget>
                       </Col>
-                      <Col sm={4}>
+                      <Col sm={3}>
                         <FieldTarget dimension='y'>
                           <Box style={{ minHeight: 40 }}>
                             <DraggableField dimension='y'
@@ -232,7 +242,7 @@ class App extends Component {
                           </Box>
                         </FieldTarget>
                       </Col>
-                      <Col sm={4}>
+                      <Col sm={3}>
                         <FieldTarget dimension='color'>
                           <Box style={{ minHeight: 40 }}>
                             <DraggableField dimension='color'
@@ -241,40 +251,20 @@ class App extends Component {
                           </Box>
                         </FieldTarget>
                       </Col>
+                      <Col smOffset={2} sm={1}>
+                        <PossibleCharts
+                          x={this.state.x}
+                          y={this.state.y}
+                          selectedChartType={this.state.chartType || guessedChartType}
+                          onClick={(chartType) => this.setState({ chartType: chartType })}
+                          />
+                      </Col>
                     </Row>
                   </Col>
                 </Row>
                 <hr />
                 <div style={{ minHeight: 350*2 - 75 - 17 }}>
-                  <Row>
-                    <Col sm={10}>
-                      {chart}
-                    </Col>
-                    <Col className="text-center" sm={2}>
-                      <p>charts</p>
-                      <Box>
-                        <ChartIcon type='Line'
-                                   isAvailable={this.state.x.name}
-                                   onClick={() => this.setState({ chartType: 'line' })}
-                                   isSelected={this.state.chartType==='line'} />
-                        <hr />
-                        <ChartIcon type='Bar'
-                                   isAvailable={this.state.x.name}
-                                   onClick={() => this.setState({ chartType: 'bar' })}
-                                   isSelected={this.state.chartType==='bar'} />
-                        <hr />
-                        <ChartIcon type='Histogram'
-                                   isAvailable={this.state.x.name}
-                                   onClick={() => this.setState({ chartType: 'histogram' })}
-                                  isSelected={this.state.chartType==='histogram'} />
-                        <hr />
-                        <ChartIcon type='Scatter'
-                                   isAvailable={this.state.x.name && this.state.y.name}
-                                   onClick={() => this.setState({ chartType: 'scatter' })}
-                                   isSelected={this.state.chartType==='scatter'} />
-                      </Box>
-                    </Col>
-                  </Row>
+                  {chart}
                 </div>
               </Col>
             </Row>
