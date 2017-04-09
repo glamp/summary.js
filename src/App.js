@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { DragDropContextProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+import 'bootswatch/lumen/bootstrap.css';
 import { Button } from 'react-bootstrap';
 import Cuadro from './components/Cuadro/Cuadro';
 import getDndContext from './services/dnd-global-context';
@@ -26,10 +27,10 @@ class App extends Component {
     return (
       <div>
         <div>
-          <Button onClick={() => this.setState({ dataset: diamonds })} bsStyle="default" bsSize="small">diamonds</Button>
-          <Button onClick={() => this.setState({ dataset: diamondsSmall })} bsStyle="primary" bsSize="small">diamonds-small</Button>
-          <Button onClick={() => this.setState({ dataset: iris })} bsStyle="info" bsSize="small">iris</Button>
-          <Button onClick={() => this.setState({ dataset: meat })} bsStyle="dark" bsSize="small">meat</Button>
+          <Button className={this.state.dataset===diamonds && 'selected'} onClick={() => this.setState({ dataset: diamonds })} bsSize="small">diamonds</Button>
+          <Button className={this.state.dataset===diamondsSmall && 'selected'} onClick={() => this.setState({ dataset: diamondsSmall })} bsSize="small">diamonds-small</Button>
+          <Button className={this.state.dataset===iris && 'selected'} onClick={() => this.setState({ dataset: iris })} bsSize="small">iris</Button>
+          <Button className={this.state.dataset===meat && 'selected'} onClick={() => this.setState({ dataset: meat })} bsSize="small">meat</Button>
           <Cuadro dataset={this.state.dataset} />
         </div>
       </div>

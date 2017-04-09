@@ -6,7 +6,6 @@ import _ from 'lodash';
 import { histogram } from 'd3';
 import simpleStatistics from 'simple-statistics';
 import 'font-awesome/css/font-awesome.css';
-import 'bootswatch/lumen/bootstrap.css';
 import './index.css';
 
 import charts from '../../services/charts';
