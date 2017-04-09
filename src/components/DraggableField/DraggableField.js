@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { DropTarget, DragSource, DragDropContextProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 const ItemTypes = { DraggableField: 'box' }
+import './DraggableField.css';
 
 
 const style = {
@@ -46,12 +47,12 @@ class DraggableField extends Component {
     const opacity = isDragging ? 0.4 : 1;
 
     if (! name) {
-      return <p className="text-center text-muted">{this.props.dimension}</p>
+      return <p className="text-center text-muted field-empty">{this.props.dimension}</p>
     }
 
     return (
       connectDragSource(
-        <div onClick={this.props.onClick} style={{ ...style, opacity }}>
+        <div className={this.props.dimension && "field-selected"} onClick={this.props.onClick} style={{ ...style, opacity }}>
           {icon}
           {' '}
           {name}

@@ -11,7 +11,7 @@ exports.makeHistogram = (data, xlab) => {
       height={350*2 - 75 - 50}
       options={{
         legend: {
-          display: false
+          display: true
         },
         scales: {
           xAxes: [{
@@ -37,7 +37,7 @@ exports.makeLine = (data, xlab) => {
       height={350*2 - 75 - 50}
       options={{
         legend: {
-          display: false
+          display: true
         },
         showLines: true,
         scales: {
@@ -64,7 +64,7 @@ exports.makeScatter = (data, xlab, ylab) => {
       height={350*2 - 75 - 50}
       options={{
         legend: {
-          display: false
+          display: true
         },
         showLines: false,
         scales: {

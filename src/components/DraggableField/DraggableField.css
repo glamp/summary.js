@@ -1,0 +1,14 @@
+.field-selected {
+  color: white;
+  background-color: steelblue;
+  border-radius: 15px;
+  padding: 5px;
+}
+
+.field-empty {
+  color: #999999;
+  background-color: white;
+  border: 1px solid lightgrey;
+  border-radius: 15px;
+  padding: 5px;
+}

@@ -5,4 +5,4 @@ var scale = d3.scaleLinear()
                     .domain([0, 10000])
                     .range([0, 1]);
 
-console.log(d3.interpolateBlues(scale(100)));
+d3.interpolateBlues(scale(100));
