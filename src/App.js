@@ -125,14 +125,6 @@ class App extends Component {
 
     return {
       datasets: datasets
-      // datasets: [{
-      //   backgroundColor: theme.primaryColor.replace(', 1)', ', 0.5)'),
-      //   borderColor: theme.primaryColor,
-      //   borderWidth: 2,
-      //   hoverBackgroundColor: 'coral',
-      //   hoverBorderColor: 'coral',
-      //   data: data
-      // }]
     }
   }
 
@@ -157,36 +149,9 @@ class App extends Component {
     }
   }
 
-  colorPaletteGenerator() {
-    const colors = [
-      'rgba(239, 236, 202, 1)',
-      'rgba(0, 48, 73, 1)',
-      'rgba(244, 211, 94, 1)',
-      'rgba(255, 147, 79, 1)',
-      'rgba(193, 145, 161, 1)',
-      // '#E7ECEF',
-      // '#274C77',
-      // '#6096BA',
-      // '#A3CEF1',
-      // '#8B8C89'
-    ]
-    return (i) => colors[i % colors.length]
-  }
-
   getHistogramData(x) {
     var data = _.map(diamonds, (item) => item[x]);
 
-    var values, labels;
-    if (isNaN(data[0])) {
-      var agg = _.countBy(data);
-      labels = _.keys(agg);
-      values = _.values(agg);
-    } else {
-      var hist = histogram().thresholds(19)
-      var bins = hist(data);
-      labels = _.map(bins, (x) => x.x0);
-      values = _.map(bins, (x) => x.length);
-    }
     var min = _.min(data);
     var max = _.max(data);
     var hist = histogram().domain([min, max]).thresholds(19)
@@ -200,11 +165,13 @@ class App extends Component {
       var bins = hist(_.map(group[1], x));
       var labels = _.map(bins, 'x0');
       var values = _.map(bins, (x) => x.length);
+
+      var color = colorGen(c);
       c++;
       return {
         label: labels,
-        backgroundColor: colorGen(c).replace(', 1)', ', 0.5)'), //, theme.primaryColor,
-        borderColor: colorGen(c), //, theme.primaryColor,
+        backgroundColor: color.replace(', 1)', ', 0.5)'),
+        borderColor: color,
         borderWidth: 2,
         data: values,
       }
