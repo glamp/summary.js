@@ -101,7 +101,24 @@ export default class Cuadro extends Component {
     if (this.state.color.name) {
       groupers.push(this.state.color.name);
     }
-    var aggreatedData = grouper.aggregate(data, groupers);
+
+    if (this.state.x.type!=='number') {
+      var xValues = _.uniq(_.map(data, this.state.x.name));
+      data = _.map(data, (row) => {
+        row[this.state.x.name] = xValues.indexOf(row[this.state.x.name]);
+        return row;
+      });
+    }
+
+    if (this.state.y.type!=='number') {
+      var yValues = _.uniq(_.map(data, this.state.y.name));
+      data = _.map(data, (row) => {
+        row[this.state.y.name] = yValues.indexOf(row[this.state.y.name]);
+        return row;
+      });
+    }
+
+    var aggregatedData = grouper.aggregate(data, groupers);
 
     var colorGen;
     var c = 0;
@@ -113,20 +130,21 @@ export default class Cuadro extends Component {
       var max = _.max(colorData);
       colorGen = palettes.numerical(min, max);
     } else {
-      var nColorsNeeded = _.size(aggreatedData);
+      var nColorsNeeded = _.size(aggregatedData);
       colorGen = palettes.categorical(nColorsNeeded);
     }
 
-    var datasets = _.map(_.toPairs(aggreatedData), (group) => {
+    var datasets = _.map(_.toPairs(aggregatedData), (group) => {
       c++;
       var bgColor, borderColor;
       if (this.state.color.type==='number') {
         borderColor = _.map(group[1], (i) => colorGen(i[this.state.color.name]));
-        bgColor = _.map(borderColor, (i) => i.replace(', 1)', ', 0.5)')); //, theme.primaryColor,
+        bgColor = _.map(borderColor, (i) => i.replace(', 1)', ', 0.5)'));
       } else {
-        borderColor = colorGen(c) //, theme.primaryColor,
-        bgColor = borderColor.replace(', 1)', ', 0.5)'); //, theme.primaryColor,
+        borderColor = colorGen(c);
+        bgColor = borderColor.replace(', 1)', ', 0.5)');
       }
+
       return {
         label: group[0],
         backgroundColor: bgColor,
@@ -137,7 +155,6 @@ export default class Cuadro extends Component {
         }),
       }
     });
-
     return {
       datasets: datasets
     }
@@ -170,10 +187,10 @@ export default class Cuadro extends Component {
     var min = _.min(data);
     var max = _.max(data);
     var hist = histogram().domain([min, max]);
-    var aggreatedData = grouper.aggregate(this.props.dataset, [this.state.color.name]);
+    var aggregatedData = grouper.aggregate(this.props.dataset, [this.state.color.name]);
 
     var c = 0;
-    var nColorsNeeded = _.size(aggreatedData);
+    var nColorsNeeded = _.size(aggregatedData);
     var colorGen;
     var labelRange;
     if (nColorsNeeded > 30) {
@@ -183,10 +200,18 @@ export default class Cuadro extends Component {
       colorGen = palettes.categorical(nColorsNeeded);
     }
 
-    var datasets = _.map(_.toPairs(aggreatedData), (group) => {
-      var bins = hist(_.map(group[1], x));
-      var labels = _.map(bins, 'x0');
-      var values = _.map(bins, (x) => x.length);
+    var datasets = _.map(_.toPairs(aggregatedData), (group) => {
+      var labels;
+      var values;
+      if (this.state.x.type==='number') {
+        var bins = hist(_.map(group[1], x));
+        labels = _.map(bins, 'x0');
+        values = _.map(bins, (x) => x.length);
+      } else {
+        var counts = _.countBy(_.map(group[1], x));
+        labels = _.keys(counts);
+        values = _.values(counts);
+      }
 
       var color = colorGen(c);
       c++;
@@ -196,7 +221,6 @@ export default class Cuadro extends Component {
         borderWidth: 2,
         data: values,
       }
-
 
       if (labelRange) {
         if (_.indexOf(labelRange, group[0]) > -1) {
@@ -208,8 +232,16 @@ export default class Cuadro extends Component {
       return dataset;
     });
 
+    var labels;
+    if (this.state.x.type==='number') {
+      labels = _.map(hist(data), 'x0')
+    } else {
+      var counts = _.countBy(data);
+      labels = _.keys(counts);
+    }
+
     return {
-      labels: _.map(hist(data), 'x0'),
+      labels: labels,
       datasets: datasets
     };
   }

@@ -14,7 +14,7 @@ const meat = require('../datasets/meat.json');
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { dataset: diamonds };
+    this.state = { dataset: diamondsSmall };
   }
 
   getChildContext() {
