@@ -1,11 +1,12 @@
 TODO
 
-- [x] bar charts for categorical variables
+- [x] (x) bar charts for categorical variables
+- [ ] (x) legends for aggregates for categorical variables
 - [ ] (?) scatter/line charts for categorical variables
-- [ ] line charts need work
-- [ ] icon toolbar for "trash + charts + save"
-- [ ] save/export chart
-- [ ] # of NA's in summary
-- [ ] Dimensions vs Values toolbar
-- [ ] support for dates
-- [ ] mini-histograms for summary
+- [ ] ( ) line charts need work
+- [ ] ( ) icon toolbar for "trash + charts + save"
+- [ ] ( ) save/export chart
+- [ ] (-) # of NA's in summary
+- [ ] (?) Dimensions vs Values toolbar
+- [ ] (?) support for dates
+- [ ] (-) mini-histograms for summary

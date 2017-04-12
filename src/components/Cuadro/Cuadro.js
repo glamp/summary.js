@@ -83,20 +83,8 @@ export default class Cuadro extends Component {
     this.setState({ summary: newSummary });
   }
 
-  getDiamondsData(x, y) {
-    return _.map(this.props.dataset, (row) => {
-      var data = {
-        x: row[x]
-      }
-      if (y) {
-        data.y = row[y];
-      }
-      return data;
-    });
-  }
-
   getScatterData(x, y) {
-    var data = _.sampleSize(this.props.dataset, Math.min(this.props.dataset.length, 1000));
+    var data = _.cloneDeep(_.sampleSize(this.props.dataset, Math.min(this.props.dataset.length, 1000)));
     var groupers = [];
     if (this.state.color.name) {
       groupers.push(this.state.color.name);
@@ -161,8 +149,17 @@ export default class Cuadro extends Component {
   }
 
   getLineData(x, y) {
-    var data = this.getDiamondsData(x, y);
-    data = _.sampleSize(data, Math.min(data.length, 20));
+    var data = [];
+    if (x && y) {
+      data = _.map(this.props.dataset, (i) => {
+        return { x: i[x], y: i[y] };
+      });
+    } else if (x) {
+      data = _.map(this.props.dataset, x);
+    } else {
+      return {};
+    }
+    data = _.cloneDeep(_.sampleSize(data, Math.min(data.length, 20)));
     if (! y) {
       data = _.zip(_.range(0, data.length), data).map((item) => {
         return { x: item[0], y: item[1].x }
@@ -182,7 +179,7 @@ export default class Cuadro extends Component {
   }
 
   getHistogramData(x) {
-    var data = _.map(this.props.dataset, x);
+    var data = _.cloneDeep(_.map(this.props.dataset, x));
 
     var min = _.min(data);
     var max = _.max(data);
