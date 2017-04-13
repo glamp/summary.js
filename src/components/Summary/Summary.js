@@ -28,7 +28,7 @@ export default class Summary extends Component {
           {this.props.statistics.map((stat) => {
             if (_.isArray(stat[1])===true) {
               return (
-                <Col className='text-center' sm={3}>
+                <Col key={`statistic-${stat[0]}`} className='text-center' sm={3}>
                   <Box>
                     <b className="muted">{stat[0]}</b>
                     <hr style={{ margin: 0, padding: 0}}/>
@@ -45,7 +45,7 @@ export default class Summary extends Component {
             }
 
             return (
-                <Col className="text-center" sm={3}>
+                <Col key={`statistic-${stat[0]}`} className="text-center" sm={3}>
                   <Box>
                     <b className="muted">{stat[0]}</b>
                     <hr style={{ margin: 0, padding: 0}}/>

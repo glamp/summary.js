@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import { DragDropContextProvider } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
 import 'bootswatch/lumen/bootstrap.css';
 import { Button } from 'react-bootstrap';
 import Cuadro from './components/Cuadro/Cuadro';

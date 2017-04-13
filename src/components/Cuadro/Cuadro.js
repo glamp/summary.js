@@ -312,7 +312,7 @@ export default class Cuadro extends Component {
                       <p><b>Dimensions</b></p>
                       {this.getColumns().filter((i) => i.type!=='number').map((column) => {
                         return (
-                          <div style={{ marginBottom: 10 }}>
+                          <div key={`dimension-${column.name}`} style={{ marginBottom: 10 }}>
                             <DraggableField name={column.name}
                                             icon={<FontAwesome name={column.type==='number' ? 'hashtag' : 'font'} style={{ color: palettes.categorical(1)(0) }} />}
                                             onClick={() => this.addDimension(null, column)}
@@ -325,7 +325,7 @@ export default class Cuadro extends Component {
                         <p><b>Measures</b></p>
                       {this.getColumns().filter((i) => i.type==='number').map((column) => {
                         return (
-                          <div style={{ marginBottom: 10 }}>
+                          <div key={`measure-${column.name}`}style={{ marginBottom: 10 }}>
                             <DraggableField name={column.name}
                                             icon={<FontAwesome name={column.type==='number' ? 'hashtag' : 'font'} style={{ color: palettes.categorical(1)(0) }} />}
                                             onClick={() => this.addDimension(null, column)}

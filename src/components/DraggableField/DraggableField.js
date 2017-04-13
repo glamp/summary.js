@@ -5,15 +5,7 @@ const ItemTypes = { DraggableField: 'box' }
 import './DraggableField.css';
 
 
-const style = {
-  cursor: 'move',
-  // border: '1px dashed gray',
-  // backgroundColor: 'white',
-  // padding: '0.5rem 1rem',
-  // marginRight: '1.5rem',
-  // marginBottom: '1.5rem',
-  // float: 'left',
-};
+const style = { cursor: 'move' };
 
 const boxSource = {
   beginDrag(props) {
@@ -38,7 +30,7 @@ class DraggableField extends Component {
   static propTypes = {
     connectDragSource: PropTypes.func.isRequired,
     isDragging: PropTypes.bool.isRequired,
-    name: PropTypes.string.isRequired,
+    // name: PropTypes.string.isRequired,
   };
 
   render() {

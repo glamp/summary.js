@@ -1,8 +1,8 @@
 TODO
 
 - [x] (x) bar charts for categorical variables
-- [ ] (x) legends for aggregates for categorical variables
-- [ ] (?) scatter/line charts for categorical variables
+- [x] (x) legends for aggregates for categorical variables
+- [x] (?) scatter/line charts for categorical variables
 - [ ] ( ) line charts need work
 - [ ] ( ) icon toolbar for "trash + charts + save"
 - [ ] ( ) save/export chart
