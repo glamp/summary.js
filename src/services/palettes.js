@@ -11,10 +11,10 @@ exports.categorical = (n) => {
 
 exports.numerical = (low, high) => {
   return (x) => {
-    var xScaled = scaleLinear()
-      .domain([low, high])
-      .range([0, 1])
-      (x);
+    var scaler  = scaleLinear()
+                    .domain([low, high])
+                    .range([0, 1]);
+    var xScaled = scaler(x);
     return interpolateSpectral(xScaled);
   }
 }

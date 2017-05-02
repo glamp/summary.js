@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import { Label, Grid, Row, Col  } from 'react-bootstrap';
-import './summary.css';
+import { Grid, Row, Col  } from 'react-bootstrap';
+import './basic-statistics.css';
 import _ from 'lodash';
 import Box from '../Box/Box';
 
@@ -20,7 +20,11 @@ class Stat extends Component {
   }
 }
 
-export default class Summary extends Component {
+export default class BasicStatistics extends Component {
+  static propTypes = {
+    statistics: PropTypes.array,
+  };
+
   render() {
     return (
       <Grid style={{ width: '100%', height: 350*2 - 75 - 50 }}>

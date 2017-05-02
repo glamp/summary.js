@@ -7,6 +7,13 @@ import './possiblecharts.css';
 
 
 export default class PossibleCharts extends Component {
+  static propTypes = {
+    x: PropTypes.object,
+    y: PropTypes.object,
+    onClick: PropTypes.func,
+    selectedChartType: PropTypes.string,
+  };
+
   constructor(props) {
     super(props);
     this.state = { showCharts: true }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Label, Grid, Row, Col, Panel, Button } from 'react-bootstrap';
+import { Grid, Row, Col, Button } from 'react-bootstrap';
 import FontAwesome from 'react-fontawesome';
 
 import _ from 'lodash';
@@ -12,16 +12,17 @@ import charts from '../../services/charts';
 import grouper from '../../services/grouper';
 import palettes from '../../services/palettes';
 
-import Summary from '../Summary/Summary';
+import FieldList from '../FieldList/FieldList';
+import BasicStatistics from '../BasicStatistics/BasicStatistics';
 import PossibleCharts from '../PossibleCharts/PossibleCharts';
 import DraggableField from '../DraggableField/DraggableField';
 import FieldTarget from '../FieldTarget/FieldTarget';
-import Box from '../Box/Box';
 
 function collectionToDataFrame(data) {
   var df = {};
-  _.keys(data[0]).map((key) => {
-    df[key] = _.map(data, key)
+  var keys = _.keys(data[0]);
+  _.each(keys, (key) => {
+    df[key] = _.map(data, key);
   });
   return df;
 }
@@ -42,10 +43,6 @@ function calculateSummary(x) {
 }
 
 
-const theme = {
-  primaryColor: 'rgb(85, 85, 85, 1)', // '#158CBA'
-}
-
 export default class Cuadro extends Component {
   constructor(props) {
     super(props);
@@ -60,6 +57,14 @@ export default class Cuadro extends Component {
 
   componentDidMount() {
     this.refreshSummary(this.props.dataset);
+  }
+
+  resetFields = () => {
+    this.setState({ 
+      x: { name: null, type: null },
+      y: { name: null, type: null },
+      color: { name: null, type: null },
+    });
   }
 
   componentWillReceiveProps(props) {
@@ -77,7 +82,7 @@ export default class Cuadro extends Component {
   refreshSummary(dataset) {
     var newSummary = {};
     var df = collectionToDataFrame(dataset);
-    _.keys(df).map((key) => {
+    _.each(_.keys(df), (key) => {
       newSummary[key] = calculateSummary(df[key]);
     });
     this.setState({ summary: newSummary });
@@ -90,7 +95,7 @@ export default class Cuadro extends Component {
       groupers.push(this.state.color.name);
     }
 
-    if (this.state.x.type!=='number') {
+    if (this.state.x.type==='categorical') {
       var xValues = _.uniq(_.map(data, this.state.x.name));
       data = _.map(data, (row) => {
         row[this.state.x.name] = xValues.indexOf(row[this.state.x.name]);
@@ -98,7 +103,7 @@ export default class Cuadro extends Component {
       });
     }
 
-    if (this.state.y.type!=='number') {
+    if (this.state.y.type==='categorical') {
       var yValues = _.uniq(_.map(data, this.state.y.name));
       data = _.map(data, (row) => {
         row[this.state.y.name] = yValues.indexOf(row[this.state.y.name]);
@@ -166,10 +171,9 @@ export default class Cuadro extends Component {
       });
     }
     return {
-      labels: _.range(0, data.length).map((i) => `${i}`),
       datasets: [{
         fill: false,
-        borderColor: theme.primaryColor,
+        borderColor: palettes.categorical(1)(0),
         borderWidth: 1,
         lineTension: 0,
         pointRadius: 2,
@@ -198,15 +202,15 @@ export default class Cuadro extends Component {
     }
 
     var datasets = _.map(_.toPairs(aggregatedData), (group) => {
-      var labels;
+      // var labels;
       var values;
       if (this.state.x.type==='number') {
         var bins = hist(_.map(group[1], x));
-        labels = _.map(bins, 'x0');
+        // labels = _.map(bins, 'x0');
         values = _.map(bins, (x) => x.length);
       } else {
         var counts = _.countBy(_.map(group[1], x));
-        labels = _.keys(counts);
+        // labels = _.keys(counts);
         values = _.values(counts);
       }
 
@@ -246,14 +250,27 @@ export default class Cuadro extends Component {
   getSummaryStats() {
     return _.toPairs(this.state.summary);
   }
+  
+  getDataType(value) {
+    if (value instanceof Date) {
+      return 'date';
+    }
+    if (isNaN(value)) {
+      return 'categorical';
+    }
+    return 'number';
+  }
 
   getColumns() {
     return _.keys(this.props.dataset[0]).map((key) => {
-      return { name: key, type: isNaN(this.props.dataset[0][key]) ? 'categorical' : 'number' }
+      return {
+        name: key,
+        type: this.getDataType(this.props.dataset[0][key])
+      }
     });
   }
 
-  addDimension(dimension, column) {
+  addDimension = (dimension, column) => {
     var { state } = this;
     if (dimension===null) {
       if (state.x.name===null) {
@@ -270,15 +287,21 @@ export default class Cuadro extends Component {
   }
 
   getChartType() {
-    this.state.x.name
-    this.state.y.name
+    if (this.state.x.name && this.state.y.name && this.props.dataset.length < 100) {
+      return 'line';
+    }
+    if (this.state.x.name && this.state.y.name) {
+      return 'scatter';
+    }
+    if (this.state.x.name) {
+      return 'histogram';
+    }
   }
 
-  render() {
-
-    var chart, guessedChartType;
+  getChart() {
+    var chart;
     if (!this.state.x.name && !this.state.y.name) {
-      chart = <Summary statistics={this.getSummaryStats()} />
+      chart = <BasicStatistics statistics={this.getSummaryStats()} />
     } else if (this.state.chartType) {
       if (this.state.chartType==='line') {
         chart = charts.makeLine(this.getLineData(this.state.x.name, this.state.y.name), this.state.x.name);
@@ -289,61 +312,42 @@ export default class Cuadro extends Component {
       } else if (this.state.chartType==='scatter') {
         chart = charts.makeScatter(this.getScatterData(this.state.x.name, this.state.y.name), this.state.x.name, this.state.y.name);
       }
-    } else if (this.state.x.name && this.state.y.name && this.props.dataset.length < 100) {
-      chart = charts.makeLine(this.getLineData(this.state.x.name, this.state.y.name), this.state.x.name);
-      guessedChartType = 'line';
-    } else if (this.state.x.name && this.state.y.name) {
-      chart = charts.makeScatter(this.getScatterData(this.state.x.name, this.state.y.name), this.state.x.name, this.state.y.name);
-      guessedChartType = 'scatter';
-    } else if (this.state.x.name) {
-      chart = charts.makeHistogram(this.getHistogramData(this.state.x.name), this.state.x.name);
-      guessedChartType = 'histogram';
+    } else {
+      var guessedChartType = this.getChartType();
+      if (guessedChartType==='line') {
+        chart = charts.makeLine(this.getLineData(this.state.x.name, this.state.y.name), this.state.x.name);
+      } else if (guessedChartType==='scatter') {
+        chart = charts.makeScatter(this.getScatterData(this.state.x.name, this.state.y.name), this.state.x.name, this.state.y.name);
+      } else if (guessedChartType==='histogram') {
+        chart = charts.makeHistogram(this.getHistogramData(this.state.x.name), this.state.x.name);
+      }
     }
+    return chart;
+  }
+
+  render() {
+    var chart = this.getChart();
+    var chartType = this.state.chartType || this.getChartType();
 
     return (
-
         <div>
           <br />
           <Grid>
             <Row>
               <Col sm={2}>
+                <FieldList columns={this.getColumns()}
+                           addDimension={this.addDimension} />
                   <div>
-                    <Box alignment="text-left" style={{ height: 350, overflow: scroll }}>
-                      <p><b>Dimensions</b></p>
-                      {this.getColumns().filter((i) => i.type!=='number').map((column) => {
-                        return (
-                          <div key={`dimension-${column.name}`} style={{ marginBottom: 10 }}>
-                            <DraggableField name={column.name}
-                                            icon={<FontAwesome name={column.type==='number' ? 'hashtag' : 'font'} style={{ color: palettes.categorical(1)(0) }} />}
-                                            onClick={() => this.addDimension(null, column)}
-                                            onDrop={(dimension) => this.addDimension(dimension, column)} />
-                          </div>
-                        );
-                      })}
-                      </Box>
-                      <Box alignment="text-left" style={{ height: 350, overflow: scroll }}>
-                        <p><b>Measures</b></p>
-                      {this.getColumns().filter((i) => i.type==='number').map((column) => {
-                        return (
-                          <div key={`measure-${column.name}`}style={{ marginBottom: 10 }}>
-                            <DraggableField name={column.name}
-                                            icon={<FontAwesome name={column.type==='number' ? 'hashtag' : 'font'} style={{ color: palettes.categorical(1)(0) }} />}
-                                            onClick={() => this.addDimension(null, column)}
-                                            onDrop={(dimension) => this.addDimension(dimension, column)} />
-                          </div>
-                        );
-                      })}
-                      </Box>
-                      <Button style={{ position: 'fixed', bottom: 0, right: 33 }}
-                              onClick={() => alert('This does nothing!')}
-                              bsStyle="primary"
-                              bsSize="small"><FontAwesome name='save' /></Button>
+                    <Button style={{ position: 'fixed', bottom: 0, right: 33 }}
+                            onClick={() => alert('This does nothing!')}
+                            bsStyle="primary"
+                            bsSize="small"><FontAwesome name='save' /></Button>
 
-                      <Button style={{ position: 'fixed', bottom: 0, right: 0 }}
-                              onClick={() => this.setState({ x: {}, y: {}, color: {} })}
-                              bsStyle="danger"
-                              bsSize="small"><FontAwesome name='trash' /></Button>
-                 </div>
+                    <Button style={{ position: 'fixed', bottom: 0, right: 0 }}
+                            onClick={this.resetFields}
+                            bsStyle="danger"
+                            bsSize="small"><FontAwesome name='trash' /></Button>
+                  </div>
               </Col>
               <Col sm={10}>
                 <Row>
@@ -374,7 +378,7 @@ export default class Cuadro extends Component {
                         <PossibleCharts
                           x={this.state.x}
                           y={this.state.y}
-                          selectedChartType={this.state.chartType || guessedChartType}
+                          selectedChartType={chartType}
                           onClick={(chartType) => this.setState({ chartType: chartType })}
                           />
                       </Col>

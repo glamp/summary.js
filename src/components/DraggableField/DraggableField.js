@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { DropTarget, DragSource, DragDropContextProvider } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
+import { DragSource } from 'react-dnd';
 const ItemTypes = { DraggableField: 'box' }
 import './DraggableField.css';
 
@@ -15,7 +14,7 @@ const boxSource = {
   },
 
   endDrag(props, monitor) {
-    const item = monitor.getItem();
+    // const item = monitor.getItem();
     const dropResult = monitor.getDropResult();
 
     if (dropResult) {

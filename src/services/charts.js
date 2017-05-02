@@ -1,7 +1,11 @@
 import React from 'react';
 import { Bar, Line } from 'react-chartjs-2';
 import _ from 'lodash';
-import { histogram } from 'd3';
+
+
+function isDate(data, axis) {
+  return data.datasets[0].data[0][axis] instanceof Date;
+}
 
 exports.makeHistogram = (data, xlab) => {
   return (
@@ -47,7 +51,8 @@ exports.makeLine = (data, xlab) => {
               fontSize: 16,
               fontStyle: 'italic',
               labelString: xlab
-            }
+            },
+            type: isDate(data, 'x') ? 'time' : 'linear',
           }]
         },
         maintainAspectRatio: false
@@ -75,7 +80,7 @@ exports.makeScatter = (data, xlab, ylab) => {
               fontStyle: 'italic',
               labelString: xlab
             },
-            type: 'linear',
+            type: isDate(data, 'x') ? 'time' : 'linear',
             position: 'bottom'
           }],
           yAxes: [{

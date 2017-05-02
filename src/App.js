@@ -7,12 +7,16 @@ import getDndContext from './services/dnd-global-context';
 const diamonds = require('../datasets/diamonds.json');
 const diamondsSmall = require('../datasets/diamonds-small.json');
 const iris = require('../datasets/iris.json');
-const meat = require('../datasets/meat.json');
+const meat = require('../datasets/meat.json').map((row) => {
+  row.date = new Date(row.date);
+  return row;
+});
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { dataset: diamondsSmall };
+    // this.state = { dataset: diamondsSmall };
+    this.state = { dataset: meat };
   }
 
   getChildContext() {

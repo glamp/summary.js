@@ -10,6 +10,11 @@ const icons = {
 
 
 export default class ChartIcon extends Component {
+  static propTypes = {
+    isSelected: PropTypes.bool.isRequired,
+    isAvailable: PropTypes.string,
+    type: PropTypes.string.isRequired,
+  }
 
   handleClick = () => {
     if (this.props.isAvailable) {
@@ -28,7 +33,9 @@ export default class ChartIcon extends Component {
     }
   }
   render() {
-    var icon = <img className="icon" src={icons[this.props.type.toLowerCase()]} />
+    var icon = <img className="icon"
+                    alt={`chart icon ${this.props.type}`}
+                    src={icons[this.props.type.toLowerCase()]} />
     return (
       <div onClick={this.handleClick} className={this.getClass()}>
         {icon}

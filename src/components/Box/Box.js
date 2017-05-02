@@ -3,6 +3,11 @@ import './box.css';
 
 
 export default class Box extends Component {
+  static propTypes = {
+    className: PropTypes.string,
+    alignment: PropTypes.string,
+    style: PropTypes.object,
+  };
   render() {
     var klasses = ['component-box'];
     if (this.props.className) {

@@ -1,20 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import { DropTarget, DragSource, DragDropContextProvider } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
+import { DropTarget} from 'react-dnd';
 const ItemTypes = { BOX: 'box' }
-
-const style2 = {
-  // height: '12rem',
-  // width: '12rem',
-  // marginRight: '1.5rem',
-  // marginBottom: '1.5rem',
-  // color: 'white',
-  // padding: '1rem',
-  // textAlign: 'center',
-  // fontSize: '1rem',
-  // lineHeight: 'normal',
-  // float: 'left',
-};
 
 const boxTarget = {
   drop(props) {
