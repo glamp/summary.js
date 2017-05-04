@@ -1,6 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import { Grid, Row, Col  } from 'react-bootstrap';
-
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
