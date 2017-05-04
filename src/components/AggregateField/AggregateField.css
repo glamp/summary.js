@@ -1,0 +1,12 @@
+.Select {
+  display: inline-block;
+  width: 150px;
+}
+
+.Select-control {
+  border-radius: 15px;
+}
+
+.Select-value {
+  width: auto;
+}

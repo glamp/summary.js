@@ -46,7 +46,7 @@ class DraggableField extends Component {
         <div className={this.props.dimension && "field-selected"} onClick={this.props.onClick} style={{ ...style, opacity }}>
           {icon}
           {' '}
-          {name}
+          {this.props.children || name}
         </div>,
       )
     );

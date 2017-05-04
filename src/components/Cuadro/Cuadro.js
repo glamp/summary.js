@@ -13,6 +13,7 @@ import grouper from '../../services/grouper';
 import palettes from '../../services/palettes';
 
 import FieldList from '../FieldList/FieldList';
+import AggregateField from '../AggregateField/AggregateField';
 import BasicStatistics from '../BasicStatistics/BasicStatistics';
 import PossibleCharts from '../PossibleCharts/PossibleCharts';
 import DraggableField from '../DraggableField/DraggableField';
@@ -52,6 +53,7 @@ export default class Cuadro extends Component {
       x: { name: null, type: null },
       y: { name: null, type: null },
       color: { name: null, type: null },
+      aggregates: [],
     }
   }
 
@@ -281,7 +283,11 @@ export default class Cuadro extends Component {
         dimension = 'color';
       }
     }
-    state[dimension] = column;
+    if (dimension==='aggregates') {
+      state.aggregates.push(column);
+    } else {
+      state[dimension] = column;
+    }
     this.setState(state);
     this.setState({ chartType: null });
   }
@@ -384,6 +390,15 @@ export default class Cuadro extends Component {
                       </Col>
                     </Row>
                   </Col>
+                </Row>
+                <Row>
+
+                  <FieldTarget dimension='aggregates'>
+                    <DraggableField dimension='aggregates'
+                                    name={null}
+                                    removeDimension={() => this.setState({ aggregates: [] })} />
+                      {_.map(this.state.aggregates, (column) => <AggregateField key={`aggregate-${column.name}`} field={column} />)}
+                  </FieldTarget>
                 </Row>
                 <hr />
                 <div style={{ minHeight: 350*2 - 75 - 17 }}>

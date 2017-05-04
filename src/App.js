@@ -4,8 +4,9 @@ import { Button } from 'react-bootstrap';
 import Cuadro from './components/Cuadro/Cuadro';
 import getDndContext from './services/dnd-global-context';
 
-const diamonds = require('../datasets/diamonds.json');
+// const diamonds = require('../datasets/diamonds.json');
 const diamondsSmall = require('../datasets/diamonds-small.json');
+const diamonds = diamondsSmall;
 const iris = require('../datasets/iris.json');
 const meat = require('../datasets/meat.json').map((row) => {
   row.date = new Date(row.date);
