@@ -274,6 +274,11 @@ export default class Cuadro extends Component {
     this.state.y.name
   }
 
+  exportChart() {
+    let png = document.getElementsByTagName('canvas')[0].toDataURL('image/png');
+    window.open(png, 'Export');
+  }
+
   render() {
 
     var chart, guessedChartType;
@@ -335,7 +340,7 @@ export default class Cuadro extends Component {
                       })}
                       </Box>
                       <Button style={{ position: 'fixed', bottom: 0, right: 33 }}
-                              onClick={() => alert('This does nothing!')}
+                              onClick={this.exportChart}
                               bsStyle="primary"
                               bsSize="small"><FontAwesome name='save' /></Button>
 
