@@ -308,7 +308,7 @@ export default class Cuadro extends Component {
             <Row>
               <Col sm={2}>
                   <div>
-                    <Box alignment="text-left" style={{ height: 350, overflow: scroll }}>
+                    <Box alignment="text-left" style={{ height: 350, overflow: 'scroll' }}>
                       <p><b>Dimensions</b></p>
                       {this.getColumns().filter((i) => i.type!=='number').map((column) => {
                         return (
@@ -321,7 +321,7 @@ export default class Cuadro extends Component {
                         );
                       })}
                       </Box>
-                      <Box alignment="text-left" style={{ height: 350, overflow: scroll }}>
+                      <Box alignment="text-left" style={{ height: 350, overflow: 'scroll' }}>
                         <p><b>Measures</b></p>
                       {this.getColumns().filter((i) => i.type==='number').map((column) => {
                         return (
