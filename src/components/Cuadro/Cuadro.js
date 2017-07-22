@@ -291,6 +291,8 @@ export default class Cuadro extends Component {
         chart = charts.makeHistogram(this.getHistogramData(this.state.x.name), this.state.x.name);
       } else if (this.state.chartType==='bar') {
         chart = charts.makeHistogram(this.getHistogramData(this.state.x.name), this.state.x.name);
+      } else if (this.state.chartType==='horizontal-bar') {
+        chart = charts.makeHorizontalBar(this.getHistogramData(this.state.x.name), this.state.x.name);
       } else if (this.state.chartType==='scatter') {
         chart = charts.makeScatter(this.getScatterData(this.state.x.name, this.state.y.name), this.state.x.name, this.state.y.name);
       }

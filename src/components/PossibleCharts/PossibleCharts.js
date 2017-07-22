@@ -26,6 +26,12 @@ export default class PossibleCharts extends Component {
                    isSelected={this.props.selectedChartType==='bar'}>
         </ChartIcon>
         <hr />
+        <ChartIcon type='HorizontalBar'
+                   isAvailable={this.props.x.name}
+                   onClick={() => this.props.onClick('horizontal-bar')}
+                   isSelected={this.props.selectedChartType==='horizontal-bar'}>
+        </ChartIcon>
+        <hr />
         <ChartIcon type='Histogram'
                    isAvailable={this.props.x.name}
                    onClick={() => this.props.onClick('histogram')}

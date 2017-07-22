@@ -14,5 +14,6 @@
 }
 
 .unavailable {
+  cursor: not-allowed;
   filter: grayscale(100%);
 }

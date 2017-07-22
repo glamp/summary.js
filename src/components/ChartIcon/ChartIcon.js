@@ -4,6 +4,7 @@ import './charticon.css';
 const icons = {
   histogram: require('./histogram.svg'),
   bar: require('./bar.svg'),
+  horizontalbar: require('./horizontal-bar.svg'),
   line: require('./line.svg'),
   scatter: require('./scatter.svg')
 }
