@@ -1,8 +1,8 @@
 {
-  "main.css": "static/css/main.12b43295.css",
-  "main.css.map": "static/css/main.12b43295.css.map",
-  "main.js": "static/js/main.e53ab25c.js",
-  "main.js.map": "static/js/main.e53ab25c.js.map",
+  "main.css": "static/css/main.99bfb776.css",
+  "main.css.map": "static/css/main.99bfb776.css.map",
+  "main.js": "static/js/main.acdfc232.js",
+  "main.js.map": "static/js/main.acdfc232.js.map",
   "static/media/bar.svg": "static/media/bar.700c15ad.svg",
   "static/media/fontawesome-webfont.eot?v=4.7.0": "static/media/fontawesome-webfont.674f50d2.eot",
   "static/media/fontawesome-webfont.svg?v=4.7.0": "static/media/fontawesome-webfont.912ec66d.svg",
@@ -15,6 +15,7 @@
   "static/media/glyphicons-halflings-regular.woff": "static/media/glyphicons-halflings-regular.fa277232.woff",
   "static/media/glyphicons-halflings-regular.woff2": "static/media/glyphicons-halflings-regular.448c34a5.woff2",
   "static/media/histogram.svg": "static/media/histogram.31a06702.svg",
+  "static/media/horizontal-bar.svg": "static/media/horizontal-bar.94ad0672.svg",
   "static/media/line.svg": "static/media/line.2ba552eb.svg",
   "static/media/scatter.svg": "static/media/scatter.db09f046.svg"
 }
