@@ -29,7 +29,7 @@ exports.makeHistogram = (data, xlab) => {
   );
 }
 
-exports.makeHorizontalBar = (data, xlab) => {
+exports.makeHorizontalBar = (data, ylab) => {
   return (
     <HorizontalBar
       data={data}
@@ -40,12 +40,12 @@ exports.makeHorizontalBar = (data, xlab) => {
           display: true
         },
         scales: {
-          xAxes: [{
+          yAxes: [{
             scaleLabel: {
               display: true,
               fontSize: 16,
               fontStyle: 'italic',
-              labelString: xlab
+              labelString: ylab
             }
           }],
         },
